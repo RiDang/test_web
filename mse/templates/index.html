@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- <link rel="icon" href="../data/bili.jpg" type="image">
+    <link href="font.css" rel="stylesheet" /> -->
+    <title>test </title>
+</head>
+<body>
+    <a href="http://127.0.0.1:8000/">链接</a>
+    <div>
+        <form id="form" action="form" method="post" target="myIframe">
+
+            <br><input type="text"  name="name" value="zdd" id="password">
+            <br><input type="hidden" name="hidden" value="123" id="hidden" >
+            <br><input type="file" name="file" value="文件选择" id="file">
+        </form>
+    </div>
+
+    <p>hello, world</p>
+    <video id="video" controls autoplay>
+        <source src="" type="video/mp4">
+        <source src="../data/v_naiqiu.mp4" type="video/mp4">
+    </video>
+
+</body>
+
+<script>
+    const video = document.querySelector("video");
+    video.muted = false;
+
+    // const assetURL = "video?name=frag_bunny.mp4";
+    // const assetURL = "video?name=frag_bunny.mp4";
+    const assetURL = "video?name=v_naiqiu_m.mp4";
+    // const assetURL = "video?name=media_test_data_bear-vp9-opus.webm";
+    // Need to be specific for Blink regarding codecs
+    // const mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
+    const mimeCodec = 'video/mp4; codecs="avc1.64001F, mp4a.40.2"';
+    // const mimeCodec = 'video/webm; codecs="vp9,opus"';
+    // const mimeCodec = 'video/mp4;codecs="av01.0.00M.10.0.110.01.01.01.0"';
+    // const mimeCodec = 'video/mp4;codecs="avc1.4D4020, mp4a.40.2"';
+    // const mimeCodec = 'audio/mp4;codecs="mp4a.40.5""';
+
+    function loadVideo() {
+        if (MediaSource.isTypeSupported(mimeCodec)) {
+            const mediaSource = new MediaSource();  // MediaSource 对象
+            console.log(mediaSource.readyState);
+            video.src = URL.createObjectURL(mediaSource); // 触发 sourceopen 事件
+            mediaSource.addEventListener("sourceopen", sourceOpen);  // 监听 sourceopen
+        } else {
+            console.error("Unsupported MIME type or codec: ", mimeCodec);
+        }
+    };
+
+    async function sourceOpen() {
+        console.log(this.readyState); // open
+        const mediaSource = this;
+        const sourceBuffer = mediaSource.addSourceBuffer(mimeCodec); // 设置 sourceBuffer(特定编码)，接收网络视频
+        const response = await fetch(assetURL);
+        const buffer = await response.arrayBuffer();
+        // 简单 updateend 事件， sourceBuffer.appendBuffer 操作之后执行的动作；
+        sourceBuffer.addEventListener("updateend", () => { 
+            mediaSource.endOfStream();
+            video.play();
+            console.log(mediaSource.readyState); // ended
+        });
+        sourceBuffer.appendBuffer(buffer);
+    };
+    loadVideo();
+
+</script>
+</html>
+

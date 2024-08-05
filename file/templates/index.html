@@ -1,0 +1,35 @@
+
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="UTF-8">
+        <title>文件一键上传</title>
+        <script type="text/javascript">
+            document.clear();
+            window.onload = function(){
+                //当点击"一键上传"按钮的时候,触发表单中的浏览文件的操作
+                document.getElementById("hehe").onclick = function(){
+                    document.getElementById("uploadfile").click();
+                };
+                //当选择好上传文件后,执行提交表单的操作
+                document.getElementById("uploadfile").onchange = function(event) {
+                    alert("上传文件");
+                    document.getElementById("form1").submit();
+                };
+            }
+            console.log("mark ...")
+        </script>
+    </head>
+
+    <body>
+        <input type="button" id="hehe" value="上传文件" />
+        <form id="form1" method="post" action="#" enctype="multipart/form-data" style="display: none;" target="iframe"> 
+            <input type="file" name="uploadfile" id="uploadfile" required/>
+        </form>
+        <iframe style="display: none;" name="iframe"/>
+    </body>
+
+
+
+</html> 

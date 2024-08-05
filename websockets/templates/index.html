@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>test </title>
+</head>
+<body>
+    <div>
+        <br><input type="file" name="file" value="文件选择" id="file">
+        <!-- <br><input type="file" name="file" value="文件选择" id="file" multiple> -->
+    </div>
+
+</body>
+<script>
+    var file =  document.getElementById("file");
+    var ws_list = []
+
+    var SEG_SIZE = 2**20;
+    file.onchange = function(event){
+        let files = event.target.files;
+
+        let reader = new FileReader();
+        reader.readAsArrayBuffer(files[0]);
+
+
+        reader.onload = function(){
+            let data = this.result;
+
+            var ws = new WebSocket("ws://localhost:8765");
+            ws.binaryType = "arraybuffer";
+            
+            ws.onopen = function(){
+                for(let i=0; i<data.byteLength; i+=SEG_SIZE){
+                    ws.send(data.slice(i, i+SEG_SIZE));
+                }
+                console.log("send over " + data.byteLength);
+            };
+
+            ws.onmessage = function(evt){
+                console.log(" - onmessage ", evt.data);
+            };
+
+            ws_list.push(ws);
+        };
+    };
+
+</script>
+</html>
+
