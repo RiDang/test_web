@@ -1,8 +1,6 @@
 # Web
 
-    Web 是一个强大、快速应用的UI；
-
-前端技术是直接沟通`用户`与`产品`的窗口，他的技术诉求是：
+前端技术是直接沟通`用户`与`产品`的窗口，它的技术诉求是：
 
 - 简单、高效
   
@@ -12,6 +10,8 @@
   
   - 开发简单、高效，同时用户使用起来也足够简单、高效；
 
+
+
     经过简单测试，感觉web入门简单，但想要灵活应用还是有些难度的，需要对 js特性、v8引擎/node.js、浏览器渲染等有一定了解。
 
     个人关注：视频流处理（MSE）——以此为中心进行扩展学习；
@@ -20,7 +20,7 @@
 
 # 1 flask
 
-简单的学习了一遍，还没有深入
+简单地学习一遍，未深入
 
 参考：[flask的基本使用 - 明-少 - 博客园](https://www.cnblogs.com/xufangming/articles/9330637.html)
 
@@ -39,6 +39,14 @@
     render_template 是字符串，可以使用make_reponse 增加其它信息；
 
     `flask.make_response(flask.render_template('index.html'))`
+
+（3）内容解析
+
+- 一般参数： flask.args/values
+
+- 表单: flask.request.form
+
+- 文件：flask.request.file
 
 # 2 三件套回顾：html/csss/Javascript
 
@@ -78,8 +86,6 @@
   
   > 自定义的变量和函数都属于window的属性和函数；
 
-
-
 （2）编程范式
 
 - 基于事件编程： 因为前端处理分成多个步骤，有前后依赖关系，而且不知道什么时候会到来，基于延时的方式比较低效；
@@ -91,10 +97,6 @@
   - 事件中通过this 获取当前标签
   
   - 通过 event.target 也可以获取；
-
-
-
-
 
 ## 2.4 Jquery
 
@@ -118,7 +120,15 @@
 
 浏览器为了安全，仅提供应用层网络协议，即https等；但效率慢、无法双向通信。
 
-websocket 提供一种直接操作TCP/UDP socket 的感觉（其实还是应用层协议）。
+websocket 提供一种直接操作TCP/UDP socket 的感觉（其实还是应用层协议）
+
+测试：
+
+- `服务器`向`客户端`发送定时数据；
+
+- `客户端`向`服务器`发送数据片段
+  
+  - 文件读取和websocket 都需要设置 arraybuffer 进行二进制传输；
 
 # 5 异步处理(CPU)：协程
 
@@ -270,41 +280,45 @@ fetch(url, headers)
   
   - 网络视频捕获（js注入）
 
+（1）-
+
+（2）系统性开发
+
+- 在进行一些操作时，有些事件需要关闭——需要根据实际情况动态调整`事件的触发`；
+
+- video.ontimeupdate —— 可以作为监控事件
+
+- 通过变量模拟锁——js 执行是单线/进程吗？？？
+
+- 对 video 和 MediaSource 方法的应用有借鉴意义； TODO
+
+
+
+（3）通过注入，捕获网络视频
+
+- 修改mediaSource 的相关协议
+  
+  - window.MediaSource.prototype.endOfStream
+    
+    - 流结束时提示下载；
+  
+  - window.MediaSource.prototype.addSourceBuffer
+    
+    - 增加捕获操作；
+  
+  - 调用：xxx.call(this, xx)
+
+- 下载方式
+  
+  - 将数据转换为标签链接，触发下载
+    
+    - URL.createObjectURL(fileBlob)
+  
+  - blob 对象的创建；
+
 ## 6.2 MP4 格式
 
 # 7 测试
-
-## 7.1 websocket
-
-在前/后端的api 结构都比较方便；
-
-测试两个功能：
-
-- 服务器定时发送
-
-- 数据传输——text/bytes
-
-## 7.2 mediaSource
-
-【参考代码】
-
-- 问题：
-
-- 什么样的视频格式可以播放？如何正确切片；
-  
-  - 生成正确格式的视频，以及meidaSource设置正确的视频格式
-  
-  - ```
-    系统性工程方式，多个片段加载问题；
-    ```
-
-- hls 时如何处理ts，并加载进入浏览器中；
-
-- 视频流，显示的最后部分；
-  
-  - 视频流的抓取
-  
-  - 任意视频流的播放
 
 ## 7.3 跨域问题
 
@@ -422,14 +436,35 @@ window.onload = function(){
 
 - 文件和form 表单是分别获取的，通过 flask.request.form 获取表单，通过flask.request.files 来获取文件（文件对象为`werkzeug.datastructures.file_storage.FileStorage`）
 
-## xxx
+# 8 流媒体解决方案
 
-- 跨域问题
+```mermaid
+graph LR
+推流--> 流媒体服务器--> 拉流
+```
 
-- https://joshuatz.com/posts/2020/appending-videos-in-javascript-with-mediasource-buffers/
+- 推流
   
-  - mediaSource 处理 webm 问题
+  - 直播：实时监控——单独购摄像头，数据为rtsp 格式
 
-- [Javascrit中使用MediaSource播放加密视频-CSDN博客](https://blog.csdn.net/camike/article/details/82797768)
+- 流媒体服务器
   
-  - 支持连续分片的代码
+  - 数据中转/分发
+  
+  - 转码等
+
+- 拉流
+  
+  - dash
+    
+    - hls——>hls.js
+  
+  - http-flv——> flv.js/mept.js
+  
+  > 前端的js库，作用是将自定义的封装，转换为video可接受的封装（mp4/webm）;
+
+【参考】
+
+- [Lewin's Blog](https://lewinblog.com/blog/page/2022/221210-flv-js.md#%E5%AE%8F%E8%A7%82%E7%BB%93%E6%9E%84)
+  
+  - 介绍了flv.js 源码
